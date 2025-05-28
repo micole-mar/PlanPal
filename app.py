@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-# ---------------------- Updated 2degrees Prepay Plan Database ----------------------
+# ---------------------- 2degrees Prepay Plans ----------------------
 plans = [
     {"name": "$8 Prepay", "data_limit": 0.15, "price": 8, "recommendation_reason": "Great for very light users who mostly call or text."},
     {"name": "$13 Prepay", "data_limit": 0.6, "price": 13, "recommendation_reason": "Includes Free Data Hour daily – good value if you stream occasionally."},
@@ -13,7 +13,7 @@ plans = [
     {"name": "$85 Prepay Unlimited", "data_limit": 9999, "price": 85, "recommendation_reason": "Unlimited plan for power users who don’t want to think about limits."}
 ]
 
-# ---------------------- Streamlit Setup ----------------------
+# ---------------------- Page Setup ----------------------
 st.set_page_config(page_title="PlanPal AI Assistant", page_icon="📱", layout="centered")
 
 st.markdown("""
@@ -24,31 +24,36 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# ---------------------- Header ----------------------
 st.title("📱 PlanPal AI Assistant")
 st.subheader("Kia ora, Micole 👋")
 st.write("We’ve analysed your mobile usage for the past month. Here’s what we found:")
 
-# ---------------------- Input Sliders ----------------------
+# ---------------------- Inputs ----------------------
 data_used = st.slider("Monthly Data Used (GB)", 0.0, 100.0, 2.5)
 calls_made = st.slider("Call Minutes Used", 0, 1000, 150)
 texts_sent = st.slider("Texts Sent", 0, 1000, 200)
 
-# ---------------------- AI Logic (Dynamic Scoring) ----------------------
+# ---------------------- AI Logic ----------------------
 def calculate_score(plan, data_used):
     if data_used <= plan["data_limit"]:
-        score = 1 - abs(data_used - plan["data_limit"]) / (plan["data_limit"] + 0.01)
+        return round(1 - abs(data_used - plan["data_limit"]) / (plan["data_limit"] + 0.01), 2)
     else:
-        score = 0.2 * plan["data_limit"] / (data_used + 0.01)
-    return round(score, 2)
+        return round(0.2 * plan["data_limit"] / (data_used + 0.01), 2)
 
+# Apply AI scoring based on live input
+scored_plans = []
 for plan in plans:
-    plan["score"] = calculate_score(plan, data_used)
+    score = calculate_score(plan, data_used)
+    scored_plan = plan.copy()
+    scored_plan["score"] = score
+    scored_plans.append(scored_plan)
 
-best_plan = max(plans, key=lambda x: x["score"])
-second_best = sorted(plans, key=lambda x: x["score"], reverse=True)[1]
+# Sort by best match
+sorted_plans = sorted(scored_plans, key=lambda x: x["score"], reverse=True)
+best_plan = sorted_plans[0]
+second_best = sorted_plans[1]
 
-# ---------------------- Output Recommendation ----------------------
+# ---------------------- Recommendation Output ----------------------
 st.markdown("---")
 st.subheader("📢 AI-Powered Recommendation")
 st.success(f"**Top Recommendation:** {best_plan['name']} ({int(best_plan['score'] * 100)}% match)")
@@ -62,14 +67,14 @@ Your recent data usage of **{data_used}GB**, combined with {calls_made} call min
 Based on your pattern, the AI suggests **{best_plan['name']}** as it balances cost and flexibility.
 """)
 
-# ---------------------- Secondary Option ----------------------
+# ---------------------- See Other Strong Option ----------------------
 with st.expander("🤖 See other strong options"):
     st.write(f"**Next Best Plan:** {second_best['name']} ({int(second_best['score'] * 100)}% match)")
     st.write(second_best['recommendation_reason'])
 
 # ---------------------- Data Table ----------------------
 st.markdown("### 📊 Plan Comparison")
-df = pd.DataFrame(plans)
+df = pd.DataFrame(scored_plans)
 df_display = df.rename(columns={
     "name": "Plan",
     "data_limit": "Data (GB)",
