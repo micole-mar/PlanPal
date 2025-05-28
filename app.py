@@ -11,10 +11,20 @@ customer = {
     "Roaming": "No"
 }
 
+
+
 st.set_page_config(page_title="2degrees AI Recommender", layout="centered")
 
 # Title
 st.title("📱 AI-Powered Plan Recommender")
+
+st.markdown(
+    "<h1 style='color:#0078C8;'>Kia ora Micole! 👋</h1><h3>Here’s how you’ve been using your plan this month:</h3>",
+    unsafe_allow_html=True
+)
+
+st.toast("📢 Based on your usage, we think you could save $15/month by switching to the $25 Carryover Plan!", icon="📱")
+
 
 # Customer Profile Overview
 st.subheader("Customer Usage Summary")
@@ -41,16 +51,6 @@ ax.legend(loc='upper right')
 ax.set_yticks([])
 
 st.pyplot(fig)
-
-# Recommendation Engine (Basic Logic)
-st.subheader("🤖 AI Recommendation")
-if usage > plan_limit:
-    st.success("✅ Recommended Plan: $25 - 10GB Carryover Plan")
-    st.markdown("""
-    You’re using **more than your plan allows**. To avoid excess charges and stay connected, we recommend upgrading to the **$25 - 10GB** plan.
-    """)
-else:
-    st.info("Your current plan is a good fit based on recent usage!")
 
 # Buttons
 col1, col2 = st.columns(2)
