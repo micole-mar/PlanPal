@@ -1,60 +1,59 @@
 import streamlit as st
-import pandas as pd
 import matplotlib.pyplot as plt
 
-# Simulated customer data
-customer = {
-    "Current Plan": "$20 - 5GB",
-    "Data Used (GB)": 8.2,
-    "Call Minutes": 312,
-    "Texts Sent": 168,
-    "Roaming": "No"
-}
+# Set page config
+st.set_page_config(page_title="PlanPal", layout="centered")
 
-
-
-st.set_page_config(page_title="2degrees AI Recommender", layout="centered")
-
-# Title
-st.title("📱 AI-Powered Plan Recommender")
-
+# Header section
 st.markdown(
-    "<h1 style='color:#0078C8;'>Kia ora Micole! 👋</h1><h3>Here’s how you’ve been using your plan this month:</h3>",
+    """
+    <div style="background-color:#00ADEF;padding:20px;border-radius:10px;color:white;text-align:center;">
+        <h2>Kia ora Micole!</h2>
+        <p>021 XXX XXXX</p>
+    </div>
+    """,
     unsafe_allow_html=True
 )
 
-st.toast("📢 Based on your usage, we think you could save $15/month by switching to the $25 Carryover Plan!", icon="📱")
+st.write("### Your Plan Snapshot")
 
+# Data pie chart
+labels = 'Used', 'Left'
+sizes = [1.89, 4.61]
+colors = ['#FFB703', '#00ADEF']
 
-# Customer Profile Overview
-st.subheader("Customer Usage Summary")
-st.markdown(f"""
-- **Current Plan**: {customer['Current Plan']}
-- **Monthly Data Usage**: {customer['Data Used (GB)']} GB
-- **Call Minutes**: {customer['Call Minutes']}
-- **Texts Sent**: {customer['Texts Sent']}
-- **Roaming**: {customer['Roaming']}
-""")
-
-# Data Usage Chart
-st.subheader("📊 Data Usage vs Plan Limit")
-
-plan_limit = 5
-usage = customer['Data Used (GB)']
-
-fig, ax = plt.subplots(figsize=(4, 1.2))
-ax.barh(['Data Used'], [usage], color='skyblue', label='Used')
-ax.barh(['Data Used'], [plan_limit], color='lightgrey', left=0, alpha=0.3, label='Plan Limit')
-ax.set_xlim(0, max(plan_limit, usage) + 2)
-ax.set_xlabel('GB')
-ax.legend(loc='upper right')
-ax.set_yticks([])
-
+fig, ax = plt.subplots()
+ax.pie(sizes, labels=labels, colors=colors, startangle=90, autopct='%1.1fGB')
+ax.axis('equal')
 st.pyplot(fig)
 
-# Buttons
+# Breakdown
+st.markdown("""
+**Data Breakdown:**
+- 📊 Plan Data: 1.50 GB  
+- 💾 Carryover: 3.11 GB  
+- 🔄 30 days to renew
+""")
+
+# Usage & Balance
 col1, col2 = st.columns(2)
-with col1:
-    st.button("📲 Switch Now")
-with col2:
-    st.button("🔁 Remind Me Later")
+col1.metric("Minutes", "1308", "to NZ & Aussie")
+col2.metric("Texts", "Unlimited*", "to NZ & Aussie")
+
+col1, col2 = st.columns(2)
+col1.button("💸 Spend")
+col2.button("🔼 Top Up")
+
+# Plan Info
+st.markdown("""
+### 📄 Current Plan
+**$19 Monthly Prepay Plan**
+- ✅ 1.5GB Carryover Data  
+- ✅ 200 Carryover mins to NZ & Aussie  
+- ✅ Unlimited* texts to NZ & Aussie  
+- ✅ Hotspotting included  
+- ✅ 5G ready
+""")
+
+# 🔔 AI Recommendation (simulated toast)
+st.toast("📢 Based on your usage, try the $13 Monthly Plan to save $6/month and still get Free Data Hour! 💡")
