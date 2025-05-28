@@ -1,26 +1,16 @@
 import streamlit as st
 import pandas as pd
 
-# ---------------------- Plan Database ----------------------
+# ---------------------- Updated 2degrees Prepay Plan Database ----------------------
 plans = [
-    {
-        "name": "$20 Carryover Plan",
-        "data_limit": 5,
-        "price": 20,
-        "recommendation_reason": "You’re currently under your data limit – this plan offers great value and includes daily Free Data Hour."
-    },
-    {
-        "name": "$25 Carryover Plan",
-        "data_limit": 10,
-        "price": 25,
-        "recommendation_reason": "You’ve been using more data lately – this plan gives you extra breathing room for just $5 more."
-    },
-    {
-        "name": "$32.50 Carryover Plan",
-        "data_limit": 80,
-        "price": 32.50,
-        "recommendation_reason": "You’re a heavy data user – this plan gives you plenty of space and all the perks."
-    }
+    {"name": "$8 Prepay", "data_limit": 0.15, "price": 8, "recommendation_reason": "Great for very light users who mostly call or text."},
+    {"name": "$13 Prepay", "data_limit": 0.6, "price": 13, "recommendation_reason": "Includes Free Data Hour daily – good value if you stream occasionally."},
+    {"name": "$19 Prepay", "data_limit": 1.5, "price": 19, "recommendation_reason": "Perfect for light data users who also need more call minutes."},
+    {"name": "$25 Prepay", "data_limit": 3, "price": 25, "recommendation_reason": "Balanced option for moderate data and call usage."},
+    {"name": "$35 Prepay", "data_limit": 4.5, "price": 35, "recommendation_reason": "More generous data with flexibility for higher call usage."},
+    {"name": "$45 Prepay", "data_limit": 10, "price": 45, "recommendation_reason": "Great for people using 5G or sharing hotspot."},
+    {"name": "$60 Prepay", "data_limit": 50, "price": 60, "recommendation_reason": "Ideal for high data consumers needing flexibility."},
+    {"name": "$85 Prepay Unlimited", "data_limit": 9999, "price": 85, "recommendation_reason": "Unlimited plan for power users who don’t want to think about limits."}
 ]
 
 # ---------------------- Streamlit Setup ----------------------
@@ -40,18 +30,16 @@ st.subheader("Kia ora, Micole 👋")
 st.write("We’ve analysed your mobile usage for the past month. Here’s what we found:")
 
 # ---------------------- Input Sliders ----------------------
-data_used = st.slider("Monthly Data Used (GB)", 0.0, 100.0, 4.5)
+data_used = st.slider("Monthly Data Used (GB)", 0.0, 100.0, 2.5)
 calls_made = st.slider("Call Minutes Used", 0, 1000, 150)
 texts_sent = st.slider("Texts Sent", 0, 1000, 200)
 
 # ---------------------- AI Logic (Dynamic Scoring) ----------------------
 def calculate_score(plan, data_used):
     if data_used <= plan["data_limit"]:
-        # The closer the usage is to the plan limit (without going over), the better
-        score = 1 - abs(data_used - plan["data_limit"]) / plan["data_limit"]
+        score = 1 - abs(data_used - plan["data_limit"]) / (plan["data_limit"] + 0.01)
     else:
-        # Penalize plans that are under-provisioned
-        score = 0.2 * plan["data_limit"] / data_used
+        score = 0.2 * plan["data_limit"] / (data_used + 0.01)
     return round(score, 2)
 
 for plan in plans:
