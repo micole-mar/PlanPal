@@ -29,7 +29,7 @@ st.subheader("Kia ora, Micole 👋")
 st.write("We’ve analysed your mobile usage for the past month. Here’s what we found:")
 
 # ---------------------- Inputs ----------------------
-data_used = st.slider("Monthly Data Used (GB)", 0.0, 100.0, 2.5)
+data_used = st.slider("Monthly Data Used (GB)", 0.0, 60.0, 2.5)
 calls_made = st.slider("Call Minutes Used", 0, 1000, 150)
 texts_sent = st.slider("Texts Sent", 0, 1000, 200)
 
