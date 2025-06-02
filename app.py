@@ -35,17 +35,36 @@ texts_sent = st.slider("Texts Sent", 0, 1000, 200)
 
 # ---------------------- AI Logic ----------------------
 def calculate_score(plan, data_used):
-    # Special logic for Unlimited Plan
-    if plan["data_limit"] > 1000:  # Assume anything over 1000GB is unlimited
-        if data_used >= 50:
-            return 1.0  # Perfect match
-        else:
-            return round(0.3 + (data_used / 50) * 0.7, 2)  # Gradually increase match as usage approaches 50GB
-    # Standard plans
-    if data_used <= plan["data_limit"]:
-        return round(1 - abs(data_used - plan["data_limit"]) / (plan["data_limit"] + 0.01), 2)
+    """
+    Scoring rules (cheapest plan that still covers the data):
+        •  >50 GB         →  $85 Prepay Unlimited
+        •  10–50 GB       →  $60 Prepay
+        •  4.5–10 GB      →  $45 Prepay
+        •  3–4.5 GB       →  $35 Prepay
+        •  1.5–3 GB       →  $25 Prepay
+        •  0.6–1.5 GB     →  $19 Prepay
+        •  0.15–0.6 GB    →  $13 Prepay
+        •  ≤0.15 GB       →  $8  Prepay
+    The logic gives a perfect score (1.0) to the single correct
+    bucket and 0 to every other plan, so the sort order is guaranteed.
+    """
+    # Unlimited plan is treated separately
+    if data_used > 50:
+        return 1.0 if plan["name"] == "$85 Prepay Unlimited" else 0.0
+    elif data_used > 10:
+        return 1.0 if plan["name"] == "$60 Prepay" else 0.0
+    elif data_used > 4.5:
+        return 1.0 if plan["name"] == "$45 Prepay" else 0.0
+    elif data_used > 3:
+        return 1.0 if plan["name"] == "$35 Prepay" else 0.0
+    elif data_used > 1.5:
+        return 1.0 if plan["name"] == "$25 Prepay" else 0.0
+    elif data_used > 0.6:
+        return 1.0 if plan["name"] == "$19 Prepay" else 0.0
+    elif data_used > 0.15:
+        return 1.0 if plan["name"] == "$13 Prepay" else 0.0
     else:
-        return round(0.2 * plan["data_limit"] / (data_used + 0.01), 2)
+        return 1.0 if plan["name"] == "$8 Prepay" else 0.0
 
 # Apply AI scoring based on live input
 scored_plans = []
