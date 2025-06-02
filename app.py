@@ -35,6 +35,13 @@ texts_sent = st.slider("Texts Sent", 0, 1000, 200)
 
 # ---------------------- AI Logic ----------------------
 def calculate_score(plan, data_used):
+    # Special logic for Unlimited Plan
+    if plan["data_limit"] > 1000:  # Assume anything over 1000GB is unlimited
+        if data_used >= 50:
+            return 1.0  # Perfect match
+        else:
+            return round(0.3 + (data_used / 50) * 0.7, 2)  # Gradually increase match as usage approaches 50GB
+    # Standard plans
     if data_used <= plan["data_limit"]:
         return round(1 - abs(data_used - plan["data_limit"]) / (plan["data_limit"] + 0.01), 2)
     else:
